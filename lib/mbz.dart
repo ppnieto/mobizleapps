@@ -23,7 +23,7 @@ class Mbz {
                 child: Text(
                   message,
                   style: messageStyle?.copyWith(color: foregroundColor),
-                  maxLines: 4,
+                  maxLines: 6,
                 ),
               ),
               if (iconData != null)
@@ -116,7 +116,7 @@ class Mbz {
   static Future<String?> inputString({required String title, TextStyle? titleStyle, EdgeInsets? padding, String? acceptText}) async {
     TextEditingController controller = TextEditingController();
     return bottomSheetColumn<String?>(padding: padding ?? const EdgeInsets.all(20), title: title, titleStyle: titleStyle, children: [
-      TextFormField(controller: controller).paddingOnly(bottom: 20),
+      TextFormField(controller: controller, autofocus: true).paddingOnly(bottom: 20),
       FilledButton(onPressed: () => Get.back(result: controller.text.isEmpty ? null : controller.text), child: Text(acceptText ?? "Aceptar"))
           .paddingOnly(bottom: 20)
     ]);

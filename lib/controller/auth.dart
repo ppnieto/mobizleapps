@@ -38,7 +38,6 @@ class AuthService<UserT extends UserBase> extends GetxController {
   }
 
   Future<void> _initializeAuthListener() async {
-    
     _authSubscription ??= auth.FirebaseAuth.instance.authStateChanges().listen((auth.User? user) async {
       Get.log("authStateChanges ");
       if (user == null) {
