@@ -45,6 +45,6 @@ abstract class MbzFirestoreFactory<T extends MbzFirestoreModel> {
   Future<void> delete({String? docId, required T model}) async {
     print('delete object ${collectionReference.doc(docId ?? model.docId).path}');
     print('delete object ${model.path}');
-    return await collectionReference.doc(docId ?? model.docId).delete();
+    return await collectionReference.doc(docId ?? model.docId).delete();    
   }
 }

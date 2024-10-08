@@ -5,7 +5,9 @@ abstract class MbzFirestoreModel<T extends MbzModel> with MbzModel<T> {
   //CollectionReference get _collectionReference => _initReference();
   bool isUpdating = false;
 
-  MbzFirestoreModel() {}
+  MbzFirestoreModel() {
+    createdAt = DateTime.now();
+  }
 
   MbzFirestoreModel.fromSnapshot(DocumentSnapshot doc) {
     docId = doc.id;

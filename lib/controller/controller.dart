@@ -38,6 +38,20 @@ abstract class MbzController extends GetxController {
     }
   }
 
+  Future<void> reloadSubscription(String name) async {
+    Map<String, Query> queries = await getSubscriptionsQueries();
+    if (_subscriptions.containsKey(name) && queries.containsKey(name)) {
+      var query = queries[name];
+      _subscriptions[name]!.cancel();
+      _subscriptions[name] = query!.snapshots().listen((event) {
+        snapshots[name] = event;
+        onSubscriptionUpdate(name);
+      });
+    } else {
+      Get.log('GetxController::No puedo recargar suscripcion $name');
+    }
+  }
+
   void updateSubscription(String subscription, Query newQuery) {
     if (_subscriptions.containsKey(subscription)) {
       _subscriptions[subscription]!.cancel();
