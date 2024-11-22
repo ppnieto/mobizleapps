@@ -19,6 +19,7 @@ abstract class MbzFirestoreFactory<T extends MbzFirestoreModel> {
   }
 
   Future<T?> create({String? docId, required T model}) async {
+    model.createdAt = DateTime.now();
     if (docId != null) {
       return await collectionReference.doc(docId).set(model).then((value) async => await find(docId));
     }
@@ -45,6 +46,6 @@ abstract class MbzFirestoreFactory<T extends MbzFirestoreModel> {
   Future<void> delete({String? docId, required T model}) async {
     print('delete object ${collectionReference.doc(docId ?? model.docId).path}');
     print('delete object ${model.path}');
-    return await collectionReference.doc(docId ?? model.docId).delete();    
+    return await collectionReference.doc(docId ?? model.docId).delete();
   }
 }

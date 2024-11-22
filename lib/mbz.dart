@@ -22,7 +22,7 @@ class Mbz {
               Expanded(
                 child: Text(
                   message,
-                  style: messageStyle?.copyWith(color: foregroundColor),
+                  style: (messageStyle ?? TextStyle()).copyWith(color: foregroundColor),
                   maxLines: 6,
                 ),
               ),
@@ -65,18 +65,19 @@ class Mbz {
     );
   }
 
-  static Future<T> bottomSheetColumn<T>({
-    String? title,
-    TextStyle? titleStyle,
-    required List<Widget> children,
-    EdgeInsets? padding,
-    Color? backgroundColor,
-  }) async {
+  static Future<T> bottomSheetColumn<T>(
+      {String? title,
+      TextStyle? titleStyle,
+      required List<Widget> children,
+      EdgeInsets? padding,
+      Color? backgroundColor,
+      CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center}) async {
     return Mbz.bottomSheet(
       Padding(
         padding: padding ?? EdgeInsets.zero,
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: crossAxisAlignment,
           children: <Widget>[
                 if (title != null) ListTile(title: Text(title, style: titleStyle)),
               ] +
@@ -104,17 +105,29 @@ class Mbz {
   }
 
   static void snackbar(BuildContext context, String message) {
-    if (context.mounted) {
+    Get.showSnackbar(GetSnackBar(
+      message: message,
+      duration: Duration(seconds: 3),
+      animationDuration: Duration(milliseconds: 180),
+      isDismissible: true,
+    ));
+    /*
+    if (context.mounted) {      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
         ),
       );
     }
+    */
   }
 
-  static Future<String?> inputString({required String title, TextStyle? titleStyle, EdgeInsets? padding, String? acceptText}) async {
+  static Future<String?> inputString(
+      {required String title, TextStyle? titleStyle, EdgeInsets? padding, String? acceptText, String? initialValue}) async {
     TextEditingController controller = TextEditingController();
+    if (initialValue != null && initialValue.isNotEmpty) {
+      controller.text = initialValue;
+    }
     return bottomSheetColumn<String?>(padding: padding ?? const EdgeInsets.all(20), title: title, titleStyle: titleStyle, children: [
       TextFormField(controller: controller, autofocus: true).paddingOnly(bottom: 20),
       FilledButton(onPressed: () => Get.back(result: controller.text.isEmpty ? null : controller.text), child: Text(acceptText ?? "Aceptar"))

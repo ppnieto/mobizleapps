@@ -3,6 +3,36 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:mobizleapps/controller/event.dart';
+import 'package:mobizleapps/classes/queries.dart';
+
+abstract class MbzQueriesController extends MbzController {
+  Future<List<MbzQuery>> getQueries();
+  List<MbzQuery> _queries = [];
+
+  @override
+  void onInit() async {
+    _queries = await getQueries();
+    super.onInit();
+    reloadSubscriptions();
+  }
+
+  @override
+  Future<Map<String, Query>> getSubscriptionsQueries() async {
+    _queries = await getQueries();
+    return {for (var query in _queries) query.name: query.query};
+  }
+
+  @override
+  void onSubscriptionUpdate(String subscription) {
+    Get.log(
+        'MbzQueriesController::$runtimeType::onSubscriptionUdpate $subscription => ${snapshots[subscription]?.docs.length}');
+    var dependant = _queries.where((query) => query.dependency == query.name);
+    for (var query in dependant) {
+      Get.log('  reload dependant query ${query.name}');
+      reloadSubscription(query.name);
+    }
+  }
+}
 
 abstract class MbzController extends GetxController {
   final Map<String, StreamSubscription> _subscriptions = {};
@@ -25,7 +55,12 @@ abstract class MbzController extends GetxController {
     _eventSubscriptions.add(id);
   }
 
-  void cancelSubscription(String uid) => Get.find<EventController>().cancelSubscription(uid);
+  //void cancelSubscription(String uid) => Get.find<EventController>().cancelSubscription(uid);
+  void cancelSubscription(String name) {
+    if (_subscriptions.containsKey(name)) {
+      _subscriptions[name]!.cancel();
+    }
+  }
 
   Future<void> reloadSubscriptions() async {
     _closeSubscriptions();

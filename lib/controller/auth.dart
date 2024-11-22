@@ -60,12 +60,15 @@ class AuthService<UserT extends UserBase> extends GetxController {
     } else {
       _currentUserDocSubscription?.cancel();
       _currentUserDocSubscription = currentUser?.userDoc?.reference.snapshots().listen((event) async {
+        Get.log('on new userDoc...');
         currentUser = await userBuilder(user);
         await currentUser?.initAsync();
         update();
+        Get.log('userDoc updated');
       });
     }
   }
+
 
   Future<void> reloadUser() async {
     Get.log('Auth::reloadUser');
