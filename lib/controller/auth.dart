@@ -1,17 +1,17 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_hub/event_hub.dart';
+import 'package:firebase_dashboard/controllers/event.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:mobizleapps/classes/user.dart';
 
 class AuthService<UserT extends UserBase> extends GetxController {
-  final Function(auth.User?)? onUserLogged;
-  final Function(auth.User?)? onUserSignout;
+  //final Function(auth.User?)? onUserLogged;
+  //final Function(auth.User?)? onUserSignout;
   final FutureOr<UserT> Function(auth.User) userBuilder;
 
-  AuthService({this.onUserLogged, this.onUserSignout, required this.userBuilder});
+  AuthService({required this.userBuilder});
 
   StreamSubscription<auth.User?>? _authSubscription;
   StreamSubscription<DocumentSnapshot>? _currentUserDocSubscription;
@@ -41,12 +41,12 @@ class AuthService<UserT extends UserBase> extends GetxController {
     _authSubscription ??= auth.FirebaseAuth.instance.authStateChanges().listen((auth.User? user) async {
       Get.log("authStateChanges ");
       if (user == null) {
-        await onUserSignout?.call(currentUser?.authUser);
+        EventController.to.fire(MbzEvents.onUserLogout.name, currentUser?.authUser);
         currentUser = null;
       } else {
         currentUser = await userBuilder(user);
         await currentUser?.initAsync();
-        await onUserLogged?.call(currentUser?.authUser);
+        EventController.to.fire(MbzEvents.onUserLogged.name, currentUser?.authUser);
       }
       _updateCurrentUserDocSubscription(user);
       update();
@@ -60,15 +60,19 @@ class AuthService<UserT extends UserBase> extends GetxController {
     } else {
       _currentUserDocSubscription?.cancel();
       _currentUserDocSubscription = currentUser?.userDoc?.reference.snapshots().listen((event) async {
-        Get.log('on new userDoc...');
+        Get.log('on change userDoc...');
         currentUser = await userBuilder(user);
         await currentUser?.initAsync();
         update();
-        Get.log('userDoc updated');
+        onUserUpdated();
       });
     }
   }
 
+  void onUserUpdated() {
+    Get.log('userDoc updated');
+  }
+/*
 
   Future<void> reloadUser() async {
     Get.log('Auth::reloadUser');
@@ -80,4 +84,5 @@ class AuthService<UserT extends UserBase> extends GetxController {
       Get.log('no encuentro usuario actual');
     }
   }
+  */
 }

@@ -11,6 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
 
+  firebase_dashboard:
+    path: "../firebase_dashboard_2"
+
+
   firebase_core:
   cloud_firestore:
   firebase_auth:

@@ -104,11 +104,12 @@ class Mbz {
     */
   }
 
-  static void snackbar(BuildContext context, String message) {
+  static void snackbar({required String message, Widget? mainButton}) {
     Get.showSnackbar(GetSnackBar(
       message: message,
       duration: Duration(seconds: 3),
       animationDuration: Duration(milliseconds: 180),
+      mainButton: mainButton,
       isDismissible: true,
     ));
     /*
